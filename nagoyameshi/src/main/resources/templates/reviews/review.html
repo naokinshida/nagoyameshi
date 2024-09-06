@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Restaurant Detail</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .fa-star.checked {
+            color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${storeinfo.storename}">Restaurant Name</h1>
+    <p><strong>Address:</strong> <span th:text="${storeinfo.address}">Address</span></p>
+    <p><strong>Phone:</strong> <span th:text="${storeinfo.phone_number}">Phone</span></p>
+    <h3>Average Score: 
+        <span th:text="${#numbers.formatDecimal(averageScore, 2, 2)}">0.00</span> / 5
+    </h3>
+    <div id="average-stars">
+        <span th:each="i : ${#numbers.sequence(1, 5)}" 
+              class="fa fa-star" 
+              th:classappend="${i <= averageScore ? ' checked' : ''}"></span>
+    </div>
+
+    <h2>Reviews</h2>
+    <div th:each="review : ${reviews}">
+        <p><strong>Score:</strong> 
+            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                  class="fa fa-star" th:classappend="${i <= review.star ? ' checked' : ''}"></span>
+        </p>
+        <p><strong>Comment:</strong> <span th:text="${review.comment}">Comment</span></p>
+        <hr>
+    </div>
+
+    <h2>Leave a Review</h2>
+    <form method="POST" th:action="@{/review}">
+        <input type="hidden" name="id" value="1" /> <!-- For testing: use actual logged-in user ID -->
+        <input type="hidden" name="storeId" th:value="${storeinfo.id}" />
+        <textarea name="comment" placeholder="Enter your review" required></textarea>
+        <br>
+        <div id="review-stars">
+            <span class="fa fa-star" data-score="1"></span>
+            <span class="fa fa-star" data-score="2"></span>
+            <span class="fa fa-star" data-score="3"></span>
+            <span class="fa fa-star" data-score="4"></span>
+            <span class="fa fa-star" data-score="5"></span>
+        </div>
+        <input type="hidden" name="star" id="review-score" value="0" />
+        <br>
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <script>
+        $(document).ready(function(){
+            $('#review-stars span').click(function(){
+                var score = $(this).data('score');
+                $('#review-score').val(score);
+                $('#review-stars span').removeClass('checked');
+                $(this).prevAll().addBack().addClass('checked');
+            });
+        });
+    </script>
+</body>
+</html>
